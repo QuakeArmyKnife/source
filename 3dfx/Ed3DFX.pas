@@ -25,7 +25,7 @@ unit Ed3DFX;
 
 interface
 
-uses Windows, SysUtils, Classes, qmath, QkObjects, QkMapPoly, QkMdlObject, QkComponent,
+uses Windows, SysUtils, Classes, qmath, QkObjects, QkMapPoly, QkMdlObjects,
      Glide, Game, QkTextures, QkImages, Setup, PyMath, PyMath3D,
      Forms, Controls, QkPixelSet;
 

@@ -24,12 +24,6 @@ See also http://www.planetquake.com/quark
 $Header$
  ----------- REVISION HISTORY ------------
 $Log$
-Revision 1.16  2000/08/19 07:30:47  tiglari
-Cacheing of DefaultImage for Shaders
-
-Revision 1.15  2000/07/18 19:38:00  decker_dk
-Englishification - Big One This Time...
-
 Revision 1.14  2000/07/09 13:20:44  decker_dk
 Englishification and a little layout
 
@@ -92,8 +86,6 @@ type
          class procedure FileObjectClassInfo(var Info: TFileObjectClassInfo); override;
         end;
   QShader = class(QPixelSet)
-            protected
-              DefaultImageCache : QPixelSet;
             public
               class function TypeInfo: String; override;
               {procedure DataUpdate;}
@@ -202,14 +194,7 @@ var
 begin
  Acces;
  Result:=Nil;
- {tiglari}
- if DefaultImageCache<>Nil then
- begin
-   result:=DefaultImageCache
- end
- else
- begin
- {/tiglari}
+
  {this function tries to guess what image should be displayed
   for the shader. The priority is
   1. the qer_editorimage
@@ -218,12 +203,8 @@ begin
   Note, that it is first tried to load as tga, then as jpeg
   }
 
-  if Specifics.Values['q']<>'' then
-   { look at the q specific (QTextureLnk.LoadPixelSet) }
-    S:=Specifics.Values['q']
-  else
-   { looks for 'qer_editorimage' }
-    S:=Specifics.Values[EditorImageSpec];
+ { looks for 'qer_editorimage' }
+ S:=Specifics.Values[EditorImageSpec];
  if S<>'' then
  begin
    try
@@ -280,10 +261,6 @@ begin
        end;
      end;
    end;
- { tiglari }
- end;
- DefaultImageCache:=Result;
- { /tiglari }
  end;
 
  {tiglari: giving shaders a size.  a presumably

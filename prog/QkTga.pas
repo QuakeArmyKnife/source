@@ -24,7 +24,6 @@ See also http://www.planetquake.com/quark
 $Header$
  ----------- REVISION HISTORY ------------
 $Log$
-
 Revision 1.8  2000/07/09 13:20:44  decker_dk
 Englishification and a little layout
 

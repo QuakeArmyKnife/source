@@ -26,9 +26,6 @@ See also http://www.planetquake.com/quark
 $Header$
  ----------- REVISION HISTORY ------------
 $Log$
-Revision 1.10  2000/07/18 19:37:59  decker_dk
-Englishification - Big One This Time...
-
 Revision 1.9  2000/07/16 16:34:50  decker_dk
 Englishification
 
@@ -48,7 +45,7 @@ interface
 
 uses Windows, SysUtils, Classes, Graphics, QkObjects, qmath,
      QkExplorer, QkFileObjects, QkForm, qmatrices, CommCtrl,
-     Menus, Controls, Qk3D, QkModel, QkFrame, QkMdlObject, QkComponent, Python;
+     Menus, Controls, Qk3D, QkMdlObjects, Python;
 
 {$DEFINE RemoveEmptySpecs}
 
@@ -234,7 +231,7 @@ procedure CheckTreeMap(Racine: TTreeMap);
 implementation
 
 uses Setup, QkMapPoly, Undo, FormCfg,
-     Game, QkMacro, Ed3DFX, Quarkx, PyMath,
+     QkMdl, Game, QkMacro, Ed3DFX, Quarkx, PyMath,
      PyMapView, PyObjects, QkImages, Bezier;
 
  {------------------------}
