@@ -2,6 +2,9 @@
 $Header$
  ----------- REVISION HISTORY ------------
 $Log$
+Revision 1.11  2000/08/23 20:59:24  aiv
+Added exception messages for debugging purposes
+
 Revision 1.10  2000/07/18 19:37:59  decker_dk
 Englishification - Big One This Time...
 

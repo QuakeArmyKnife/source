@@ -24,7 +24,7 @@ See also http://www.planetquake.com/quark
 program QuArK;
 
 uses
-  MemTester in 'Prog\MemTester.pas',
+{$IFDEF Debug} MemTester in 'Prog\MemTester.pas', {$ENDIF}
   Forms,
   QkObjects in 'Prog\QkObjects.pas',
   Qk1 in 'Prog\Qk1.pas' {Form1},
@@ -63,6 +63,8 @@ uses
   Game2 in 'Prog\Game2.pas' {AddOnsAddDlg},
   Toolbar1 in 'Prog\Toolbar1.pas',
   TbUndoMenu in 'Prog\TbUndoMenu.pas' {UndoDlg},
+  QkMdl in 'Prog\QkMdl.pas' {FQMdl},
+  QkMdlObjects in 'Prog\QkMdlObjects.pas',
   Qk3D in 'Prog\Qk3D.pas',
   QkMacro in 'Prog\QkMacro.pas',
   QkFormVw in 'Prog\QkFormVw.pas' {FQFormVw},
@@ -130,30 +132,8 @@ uses
   QkQ3 in 'prog\QkQ3.pas',
   QkText in 'prog\QkText.pas',
   QkSpr in 'prog\QkSpr.pas',
-  QkSoF in 'prog\QkSoF.pas',
-  form_Model in 'prog\model\form_Model.pas' {FQMdl},
-  QkBoneGroup in 'prog\model\QkBoneGroup.pas',
-  QkComponent in 'prog\model\QkComponent.pas',
-  QkFrame in 'prog\model\QkFrame.pas',
-  QkFrameGroup in 'prog\model\QkFrameGroup.pas',
-  QkMd2 in 'prog\model\QkMd2.pas',
-  QkMdl in 'prog\model\QkMdl.pas',
-  QkMdlObject in 'prog\model\QkMdlObject.pas',
-  QkMiscGroup in 'prog\model\QkMiscGroup.pas',
-  QkModel in 'prog\model\QkModel.pas',
-  QkModelBone in 'prog\model\QkModelBone.pas',
-  QkModelFile in 'prog\model\QkModelFile.pas',
-  QkModelRoot in 'prog\model\QkModelRoot.pas',
-  QkModelTag in 'prog\model\QkModelTag.pas',
-  QkQkl in 'prog\model\QkQkl.pas',
-  QkSkinGroup in 'prog\model\QkSkinGroup.pas',
-  QkMd3 in 'prog\model\QkMd3.pas',
-  QkQ1 in 'prog\QkQ1.pas',
-  QkQ2 in 'prog\QkQ2.pas',
-  qkskindrawobject in 'prog\model\qkskindrawobject.pas',
-  Qk3ds in 'prog\model\Qk3ds.pas',
-  Logging in 'prog\Logging.pas',
-  PyLogging in 'python\PyLogging.pas';
+  QkMd3 in 'prog\QkMd3.pas',
+  QkSoF in 'prog\QkSoF.pas';
 
 {$R *.RES}
 

@@ -26,25 +26,8 @@ See also http://www.planetquake.com/quark
 $Header$
  ----------- REVISION HISTORY ------------
 $Log$
-Revision 1.19  2000/10/27 10:06:48  tiglari
-comments and cleanup to brush prim support;
-ancestry comments reinstated
-
-Revision 1.18  2000/10/26 18:10:17  tiglari
-fixed problems blocking non-brush prim format for Q3A
-
-Revision 1.17  2000/10/26 17:16:29  tiglari
-brush primitives format support, needs a bit more checking (I accidentally
-committed a definitely bad version, this one could be OK...
-
-Revision 1.16  2000/10/26 17:02:33  tiglari
-added soEnableBrushPrim build flag
-
-Revision 1.15  2000/10/17 20:33:21  tiglari
-Ancestry & Brush# writing
-
-Revision 1.14  2000/09/24 23:55:41  alexander
-committed tiglaris texture flag fix
+Revision 1.13.2.1  2000/09/21 08:37:26  tiglari
+fix for SOF default flags problem
 
 Revision 1.13  2000/07/21 20:01:33  decker_dk
 Correctly Save HalfLife WAD3s
@@ -262,7 +245,7 @@ procedure RechercheAdjacents(Concerne, Source: PyObject; Simple, Double: Boolean
 implementation
 
 uses QkFileObjects, Undo, PyMapView, QkPixelSet,
-     Ed3DFX, Quarkx, PyObjects, QkSin, QkQuakeCtx, Math;
+     Ed3DFX, Quarkx, PyObjects, QkSin, QkQuakeCtx;
 
 const
  TmpFaceSpec = '!~tmp~!this is a bug';
@@ -1889,130 +1872,12 @@ begin
  end;
 end;*)
 
-(* don't actually need this right now
-   should to qo qmatrices.pas if it is needed
-function MatrixMult(const Matrice : TMatrixTransformation; const V: TVect) : TVect;
-begin
-   Result.X:=Matrice[1,1]*V.X+Matrice[1,2]*V.Y+Matrice[1,3]*V.Z{+Matrice[1,4]};
-   Result.Y:=Matrice[2,1]*V.X+Matrice[2,2]*V.Y+Matrice[2,3]*V.Z{+Matrice[2,4]};
-   Result.Z:=Matrice[3,1]*V.X+Matrice[3,2]*V.Y+Matrice[3,3]*V.Z{+Matrice[3,4]};
-end;
-*)
-
-
-function CoordShift(P, texO, texS, texT : TVect) : TVect;
-var D: TVect;
-begin
-   D:=VecDiff(P,texO);
-   Result.X:=Dot(D,texS);
-   Result.Y:=Dot(D,texT);
-   Result.Z:=0.0;
-end;
-
-
-{ algorithm from Q3R as provided by Timothee Besset }
-procedure GetAxisBase(const Normal0: TVect; var texS, texT: TVect);
-var
- Normal : TVect;
- RotY,RotZ : Double;
-begin
- Normal:=Normal0;
- { do some cleaning }
- if Abs(Normal.X)<1e-6 then
-  Normal.X:=0.0;
- if Abs(Normal.Y)<1e-6 then
-  Normal.Y:=0.0;
- if Abs(Normal.Z)<1e-6 then
-  Normal.Z:=0.0;
- RotY:=-ArcTan2(Normal.Z,sqrt(Normal.Y*Normal.Y+Normal.X*Normal.X));
- RotZ:=ArcTan2(Normal.Y,Normal.X);
- { rotate (0,1,0) and (0,0,1) to compute texS and texT  }
- texS.X:=-Sin(RotZ);
- texS.Y:=Cos(RotZ);
- texS.Z:=0.0;
- { the texT vector is along -Z ( T texture coorinates axis )  }
- texT.X:=-Sin(RotY)*Cos(RotZ);
- texT.Y:=-Sin(RotY)*Sin(RotZ);
- texT.Z:=-Cos(RotY);
-end;
-
-function InvertDenom(P0, P1, P2 : TVect) : Double;
-begin
- Result:=-P2.X*P1.Y + P2.X*P0.Y + P2.Y*P1.X
-   - P2.Y*P0.X + P0.X*P1.Y - P0.Y*P1.X;
-end;
-
-{ based on information about Q3R brush primitives format
-  provided by Timothee Besset }
-procedure GetPXPY(const Normal: TVect; const V: TThreePoints; Mirror: boolean; var PX, PY: array of Double; const Dist : Double);
-var
-  texS, texT, texO, P0, P1, P2: TVect;
-  D : Double;
-begin
-  { get basis vectors for affine plane of face }
-  GetAxisBase(Normal, texS, texT);
-  { origin of plane's coordindate system }
-  texO:=VecScale(Dist, Normal);
-  { get the texture points.  V has been provided by
-     Face.GetThreePointsUserTex, so if texture scale
-     is 1:1, (P1-P0) will be texture width, P2-P0
-     texture height.  In written out map, for 1:1
-     texture scale these #'s will be 128 }
-  P0:=V[1];
-  if Mirror then
-   begin
-    P2:=V[2]; P1:=V[3];
-   end
-  else
-   begin
-    P2:=V[3]; P1:=V[2];
-   end;
-   { redo threepoints in plane coordinate system }
-   P0:=CoordShift(P0, texO, texS, texT);
-   P1:=CoordShift(P1, texO, texS, texT);
-   P2:=CoordShift(P2, texO, texS, texT);
-
-   { Now solve the equation system produced
-     where PX, PY are to be row 1 and row 2
-     of the homogenous matrix that will map
-     (0,0), (1,0) and (0,-1) onto P0, P1, P2
-     respectively (note sign swap) }
-
-   D:=InvertDenom(P0, P1, P2);
-
-   PX[1]:=(P2.Y-P0.Y)/D;
-   PX[2]:=(P0.X-P2.X)/D;
-   PX[3]:=(-P2.Y*P0.X+P2.X*P0.Y)/D;
-   PY[1]:=(P1.Y-P0.Y)/D;
-   PY[2]:=(P0.X-P1.X)/D;
-   PY[3]:=(-P0.X*P1.Y+P0.Y*P1.X)/D;
-end;
-
-
 procedure TPolyedre.SauverTextePolyedre(Brush: TStrings; OriginBrush: PVect; Flags: Integer);
 var
  MJ: Char;
  J: Integer;
  Q: QObject;
- WriteIntegers, BrushPrim : Boolean;
-
-    procedure write3vect(const P: array of Double; var S: String);
-    var
-     I: Integer;
-     R: Double;
-    begin
-     S:=S+'( ';
-     S:=S+FloatToStrF(P[1], ffFixed, 20, 5)+' ';
-     S:=S+FloatToStrF(P[2], ffFixed, 20, 5)+' ';
-     S:=S+FloatToStrF(P[3], ffFixed, 20, 5)+' ';
-
-     {     for I:=1 to 3 do
-     begin
-       R:=P[I]/EchelleTexture;
-       S:=S+FloatToStrF(R, ffFixed, 20, 5)+' ';
-     end;
-}     S:=S+') ';
-    end;
+ WriteIntegers: Boolean;
 
   procedure WriteFace(F: TFace);
   const
@@ -2022,11 +1887,10 @@ var
   var
    S, S1, S2, S3: String;
    I, R: Integer;
-   P, PT: TThreePoints;
+   P: TThreePoints;
    Params: TFaceParams;
    Delta1: TVect;
    Facteur: TDouble;
-   PX, PY: array[1..3] of Double;
 
    { tiglari }
    rval : Single; { for Value/lightvalue }
@@ -2199,16 +2063,6 @@ var
         else
          S:=S+FloatToStrF(Z, ffFixed, 20, 5)+' ) ';
        end;
-     if (MJ=mjQ3A) and BrushPrim then
-      with F do
-       begin
-        GetThreePointsUserTex(PT[1], PT[2], PT[3],Nil);
-        GetPXPY(Normale, PT, TextureMirror, PX, PY, Dist);
-        S:=S+'( ';
-        write3vect(PX,S);
-        write3vect(PY,S);
-        S:=S+') ';
-       end;
      with F do
       begin
        {$IFDEF TexUpperCase}
@@ -2219,8 +2073,6 @@ var
        else
         S:=S+NomTex;
        {$ENDIF}
-       if not ((MJ=mjQ3A) and BrushPrim) then
-       begin
        ApproximateParams(Normale, P, Params, TextureMirror);
        for I:=1 to 2 do
         S:=S+' '+IntToStr(Round(Params[I]));
@@ -2232,7 +2084,6 @@ var
          else
           S:=S+' '+FloatToStrF(Params[I], ffFixed, 20, 5);
         end;
-       end;
       end;
      if MJ=mjHexen then
       S:=S+' -1'
@@ -2284,13 +2135,13 @@ var
                written into the map.  Alex write code to
                put the c, f, v flags into the texture link }
       if (MJ=mjKingPin) then
-      begin
-       Q := GlobalFindTexture(F.NomTex,Nil);  { find the Texture Link object }
-       if Q<>Nil then Q.Acces;              { load it (but not the texture it points to !) }
-       S1:=CheckFieldDefault('Contents','c', Q);
-       S2:=CheckFieldDefault('Flags','f', Q);
-       S3:=CheckFieldDefault('Value','v', Q);
-       S:=S+' '+S1+' '+S2+' '+S3;
+       begin
+        Q := GlobalFindTexture(F.NomTex,Nil);  { find the Texture Link object }
+         if Q<>Nil then Q.Acces;              { load it (but not the texture it points to !) }
+        S1:=CheckFieldDefault('Contents','c', Q);
+        S2:=CheckFieldDefault('Flags','f', Q);
+        S3:=CheckFieldDefault('Value','v', Q);
+        S:=S+' '+S1+' '+S2+' '+S3;
        end
       else {for me, SOF seems to behave like Q2, but for other
         people, default flags seem to be written into the map
@@ -2305,7 +2156,7 @@ var
         S3:=CheckFieldDefault('Value','Value', Q);
         S:=S+' '+S1+' '+S2+' '+S3;
        end
-     else
+      else
       { and in Q2, default flags get written into the map
         automatically, no wuccaz (<- wuccin furries) }
       {\tiglari}
@@ -2331,15 +2182,8 @@ var
 begin
  if Info.ConstruirePolyedres and not CheckPolyhedron then Exit;
  WriteIntegers:= {$IFDEF WriteOnlyIntegers} True {$ELSE} Flags and soDisableFPCoord <> 0 {$ENDIF};
- BrushPrim:=Flags and soEnableBrushPrim<>0;
  MJ:=CharModeJeu;
- Brush.Add(Comment[(MJ>='A') and (MJ<='Z')]+' '+Ancestry);
  Brush.Add(' {');
- if (MJ=mjQ3A) and BrushPrim then
- begin
-  Brush.Add('brushDef');
-  Brush.Add(' {');
- end;
  if Info.ConstruirePolyedres then
   for J:=0 to Faces.Count-1 do
    WriteFace(PSurface(Faces[J])^.F)
@@ -2350,8 +2194,6 @@ begin
     if Q is TFace then
      WriteFace(TFace(Q));
    end;
- if (MJ=mjQ3A) and BrushPrim then
-   Brush.Add(' }');
  Brush.Add(' }');
 end;
 
@@ -4058,8 +3900,6 @@ begin
   else
    Result:='Z';   { face points to axis Z }
 end;*)
-
-
 
 procedure TFace.SetFaceFromParams(const nNormale: TVect; nDist: TDouble; const TexParams: TFaceParams);
 

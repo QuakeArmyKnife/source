@@ -24,6 +24,9 @@ See also http://www.planetquake.com/quark
 $Header$
  ----------- REVISION HISTORY ------------
 $Log$
+Revision 1.8  2000/10/15 15:58:44  alexander
+correct error message for v46 bsp files
+
 Revision 1.7  2000/07/18 19:37:58  decker_dk
 Englishification - Big One This Time...
 
@@ -402,28 +405,28 @@ begin
  case Header.Version of
    VersionBSP2:
    begin
-     for E:=Low(E) to High(E) do
-     begin
-       if Header.Entrees[E].Taille<0 then
-         Raise EErrorFmt(5509, [84]);
-       if Header.Entrees[E].Taille=0 then
-         Header.Entrees[E].Position:=SizeOf(Header)
-       else
-       begin
-         if Header.Entrees[E].Position<SizeOf(Header) then
-           Raise EErrorFmt(5509, [85]);
-         if Header.Entrees[E].Position+Header.Entrees[E].Taille > Taille then
-         begin
-           Header.Entrees[E].Taille:=Taille - Header.Entrees[E].Position;
-           GlobalWarning(LoadStr1(5641));
-         end;
-       end;
-       F.Position:=Origine + Header.Entrees[E].Position;
-       Q:=OpenFileObjectData(F, Bsp2EntryNames[E], Header.Entrees[E].Taille, Self);
-       SubElements.Add(Q);
-       LoadedItem(rf_Default, F, Q, Header.Entrees[E].Taille);
-     end;
-     ObjectGameCode:=CurrentQuake2Mode;
+ for E:=Low(E) to High(E) do
+  begin
+   if Header.Entrees[E].Taille<0 then
+    Raise EErrorFmt(5509, [84]);
+   if Header.Entrees[E].Taille=0 then
+    Header.Entrees[E].Position:=SizeOf(Header)
+   else
+    begin
+     if Header.Entrees[E].Position<SizeOf(Header) then
+      Raise EErrorFmt(5509, [85]);
+     if Header.Entrees[E].Position+Header.Entrees[E].Taille > Taille then
+      begin
+       Header.Entrees[E].Taille:=Taille - Header.Entrees[E].Position;
+       GlobalWarning(LoadStr1(5641));
+      end;
+    end;
+   F.Position:=Origine + Header.Entrees[E].Position;
+   Q:=OpenFileObjectData(F, Bsp2EntryNames[E], Header.Entrees[E].Taille, Self);
+   SubElements.Add(Q);
+   LoadedItem(rf_Default, F, Q, Header.Entrees[E].Taille);
+  end;
+ ObjectGameCode:=CurrentQuake2Mode;
    end; {bspversion versionquake 2}
 
    VersionBSP3:

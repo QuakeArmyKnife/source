@@ -24,9 +24,6 @@ See also http://www.planetquake.com/quark
 $Header$
  ----------- REVISION HISTORY ------------
 $Log$
-Revision 1.8  2000/07/18 19:38:01  decker_dk
-Englishification - Big One This Time...
-
 Revision 1.7  2000/07/16 16:33:39  decker_dk
 Englishification
 
@@ -108,7 +105,7 @@ uses Classes, Dialogs, Graphics, CommCtrl, ExtCtrls, Controls,
      Undo, QkGroup, Qk3D, PyTravail, ToolBox1, Config, PyProcess,
      Console, Game, {$IFDEF VER90} ShellObj, {$ELSE} ShlObj, {$ENDIF}
      Output1, About, Reg2, SearchHoles, QkMapPoly, HelpPopup1,
-     PyForms, QkPixelSet, Bezier, PyLogging;
+     PyForms, QkPixelSet, Bezier;
 
  {-------------------}
      
@@ -2246,20 +2243,8 @@ begin
  end;
 end;
 
-{AiV}
-function xLogging(self, args: PyObject) : PyObject; cdecl;
-begin
- try
-  Result:=GetLoggingModule;
- except
-  EBackToPython;
-  Result:=Nil;
- end;
-end;
-{/AiV}
-
 const
- MethodTable: array[0..65] of TyMethodDef =
+ MethodTable: array[0..64] of TyMethodDef =
   ((ml_name: 'Setup1';       ml_meth: xSetup1;       ml_flags: METH_VARARGS),
    (ml_name: 'newobj';       ml_meth: xNewObj;       ml_flags: METH_VARARGS),
    (ml_name: 'newfileobj';   ml_meth: xNewFileObj;   ml_flags: METH_VARARGS),
@@ -2325,7 +2310,6 @@ const
    (ml_name: 'needgamefile'; ml_meth: xNeedGameFile; ml_flags: METH_VARARGS),
    (ml_name: 'wait';         ml_meth: xWait;         ml_flags: METH_VARARGS),
    (ml_name: 'exit';         ml_meth: xExit;         ml_flags: METH_VARARGS),
-{AiV}(ml_name: 'logging';      ml_meth: xLogging;       ml_flags: METH_VARARGS),
    (ml_Name: Nil;            ml_meth: Nil));
 
  {-------------------}

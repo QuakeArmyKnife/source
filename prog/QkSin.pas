@@ -26,9 +26,6 @@ See also http://www.planetquake.com/quark
 $Header$
  ----------- REVISION HISTORY ------------
 $Log$
-Revision 1.6  2000/07/18 19:38:01  decker_dk
-Englishification - Big One This Time...
-
 Revision 1.5  2000/07/16 16:34:51  decker_dk
 Englishification
 
@@ -47,8 +44,7 @@ unit QkSin;
 interface
 
 uses Windows, SysUtils, Classes, Graphics, Dialogs, Controls,
-     QkObjects, QkFileObjects, QkTextures, QkPak, qmath
-     ,QkQ2;
+     QkObjects, QkFileObjects, QkTextures, QkPak, qmath;
 
 type
  QTextureSin = class(QTexture2)

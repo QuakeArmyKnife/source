@@ -24,18 +24,6 @@ See also http://www.planetquake.com/quark
 $Header$
  ----------- REVISION HISTORY ------------
 $Log$
-Revision 1.14  2000/09/18 01:31:48  alexander
-added enum for startrek voyager elite force
-
-Revision 1.12  2000/08/25 17:57:52  decker_dk
-Comment about possible bug. Look for FIXME
-
-Revision 1.11  2000/08/21 20:45:13  aiv
-Added ModelColor
-
-Revision 1.10  2000/07/18 19:38:01  decker_dk
-Englishification - Big One This Time...
-
 Revision 1.9  2000/07/16 16:34:51  decker_dk
 Englishification
 
@@ -80,17 +68,15 @@ const
  instance have a mixture of file-formats like .WADs _and_ .SHADERS.
  Of cause this will only allow up to 32 different games, but shouldn't that
  be enough? }
- mjQuake      = '1';
- mjHexen      = '2';
- mjHalfLife   = '3';
- mjQuake2     = 'A';
- mjHeretic2   = 'B';
- mjSin        = 'C';
- mjKingPin    = 'D';
- mjSOF        = 'E';
- mjQ3A        = 'a';
- mjStarTrekEF = 'b';
- mjCrystalSpace = 'c';
+ mjQuake    = '1';
+ mjHexen    = '2';
+ mjHalfLife = '3';
+ mjQuake2   = 'A';
+ mjHeretic2 = 'B';
+ mjSin      = 'C';
+ mjKingPin  = 'D';
+ mjSOF      = 'E';
+ mjQ3A      = 'a';
 
  mjAny       = #1;
  mjNotQuake2 = #2;
@@ -100,9 +86,6 @@ type
  TListeCouleurs =
   (lcVueXZ, lcVueXY, lcSelXZ, lcSelXY, lcOutOfView, lcAxes, lcGridXZ, lcGridXY, lcGridLines,
    lcBrushEntity, lcDuplicator, lcTag, lcGrayImage, lcBSP, lcDigger, lcBezier);
- TModelColors =
-  (mcVueXZ, mcVueXY, mcSelXZ, mcSelXY, mcOutOfView, mcAxes, mcGridXZ, mcGridXY, mcGridLines,
-   mcTag, mcGrayImage, mcLinear, mcVertices);
  TSetupSet =
   (ssGeneral, ssGames, ssMap, ssModel, ssToolbars{, ssTempData});
  TSetupSetArray = array[TSetupSet] of QObject;
@@ -122,8 +105,6 @@ type
 var
  ApplicationPath: String;
  SetupSet: TSetupSetArray;
-{--CONVEX-- support for multiple texture formats}
- TexExtensions : TStringList = NIL;
 
 const  { for SetupChanged }
  scInit      = 0;
@@ -157,8 +138,6 @@ procedure RefreshAssociations(Forced: Boolean);
 procedure RemoveAssociations;
 function AssociationWithQuArK(const FileExt: String) : Boolean;
 
-procedure StoreTexExtensions; {--CONVEX--}
-
  {------------------------}
 
 function CharModeJeu: Char;
@@ -170,7 +149,6 @@ procedure ChangeGameMode(nMode: Char; Confirm: Boolean);
 procedure ChangeGameModeStr(const nMode: String; Confirm: Boolean);
 function GetGameCode(const nMode: String) : Char;
 function MapColors(L: TListeCouleurs) : TColor;
-function ModelColors(L: TModelColors) : TColor;
 {function GetIncludePath: String;}
 function InternalVersion : Single;
 function GameModeOk(nMode: Char) : Boolean;
@@ -294,33 +272,6 @@ begin
   Raise EErrorFmt(5205, [SetupSetName[Root]+':'+SubSet]);
 end;
 
-{--CONVEX-begin--}
-procedure StoreTexExtensions;
-var
- C:Char;
- Idx : Byte;
- S, SubStr : String;
-begin
-  S := SetupGameSet.Specifics.Values['TextureFormat'];
-  if TexExtensions <> NIL then TexExtensions.Free;
-  TexExtensions := TStringList.Create;
-  Idx := 1;
-  while Idx <= Length(S) do
-  begin
-    SubStr := '';
-    C := #0;
-    while (C <> ' ') and (C <> ',') and (Idx <= Length(S)) do
-    begin
-      C := S[Idx];
-      if (C <> ' ') and (C <> ',') then
-        SubStr := SubStr + C;
-      Inc (Idx);
-    end;
-    TexExtensions.Add (SubStr);
-  end;
-end;
-{--CONVEX-end--}
-
 function SetupGameSet : QObject;
 begin
  SetupGameSet:=SetupSubSet(ssGames, SetupSet[ssGames].Specifics.Values['GameCfg']);
@@ -363,7 +314,7 @@ var
  I, P: Integer;
  S, Spec, Arg: String;
  Test, NewTarget: QObject;
-begin
+begin 
  Q.Acces;
  for I:=0 to Q.Specifics.Count-1 do
   begin
@@ -399,14 +350,14 @@ var
  T: TSetupSet;
 begin
  if Q is QFileObject then
-  begin
+  begin       
    Q.Acces;
    ProgressIndicatorStart(5445, Q.SubElements.Count); try
    for I:=0 to Q.SubElements.Count-1 do
     begin
      BrowseConfig(Q.SubElements[I]);
      ProgressIndicatorIncrement;
-    end;
+    end; 
    finally ProgressIndicatorStop; end;
   end
  else
@@ -472,7 +423,7 @@ begin
    BrowseConfig(SetupQrk);  { copies this setup data into memory }
   finally
    SetupQrk.AddRef(-1);
-  end;
+  end;                                     
  except
   on E: Exception do
    begin
@@ -562,7 +513,6 @@ begin
 
   { sends the reset message to all windows }
  PosteMessageFiches(wp_SetupChanged, Level);
- StoreTexExtensions; {--Convex--}
  if Level = scInit then Exit;
 
   { sends the reset message to Python }
@@ -752,22 +702,19 @@ begin
     Result.SubElements.Add(ExactFileLink(DefaultsFileName1, Result, False));
   (*Result.SubElements.Add(LienFichierQObject(
      SetupGameSet.Specifics.Values['Base'], Result));*)
-    L:=TStringList.Create;
-    try
-     L.Text:=SetupGameSet.Specifics.Values['AddOns'];
-     for I:=0 to L.Count-1 do
-      try
-       Result.SubElements.Add(LienFichierQObject(L[I], Result, False));
-      except
-       on EQObjectFileNotFound do
-        if I=0 then
-         GlobalWarning(FmtLoadStr1(5549, [SetupGameSet.Name, L[I]]))
-        else
-         GlobalWarning(FmtLoadStr1(5557, [L[I]]));
-      end;
-    finally
-     L.Free;
-    end;
+    L:=TStringList.Create; try
+    L.Text:=SetupGameSet.Specifics.Values['AddOns'];
+    for I:=0 to L.Count-1 do
+     try
+      Result.SubElements.Add(LienFichierQObject(L[I], Result, False));
+     except
+      on EQObjectFileNotFound do
+       if I=0 then
+        GlobalWarning(FmtLoadStr1(5549, [SetupGameSet.Name, L[I]]))
+       else
+        GlobalWarning(FmtLoadStr1(5557, [L[I]]));
+     end;
+    finally L.Free; end;
     for I:=0 to Result.SubElements.Count-1 do
      with Result.SubElements[I] do
       Flags:=Flags or ofWarnBeforeChange;
@@ -780,7 +727,7 @@ begin
   end
  else
   Result:={Info^.}AddOns;
- Result.AddRef(+1); {DECKER - FIXME - Possible cause of "double Result.AddRef(+1)" here?}
+ Result.AddRef(+1);
 end;
 
 procedure CloseAddonsList;
@@ -834,27 +781,6 @@ const
 function MapColors(L: TListeCouleurs) : TColor;
 begin
  Result:=SetupSubSet(ssMap, 'Colors').IntSpec[MapColorNames[L]];
-end;
-
-const
-  ModelColorNames: array[TModelColors] of String =
-  ('ViewXZ',
-   'ViewXY',
-   'SelXZ',
-   'SelXY',
-   'Gray',
-   'Axis',
-   'GridXZ',
-   'GridXY',
-   'GridLines',
-   'Tag',
-   'GrayImage',
-   'Linear',
-   'Vertices');
-
-function ModelColors(L: TModelColors) : TColor;
-begin
- Result:=SetupSubSet(ssModel, 'Colors').IntSpec[ModelColorNames[L]];
 end;
 
 function CharModeJeu: Char;
@@ -945,7 +871,7 @@ begin
   mjNotQuake1: if not ModeJeuQuake2 then
                 nMode:=mjQuake2
                else
-                Exit;
+                Exit; 
  else
    if CharModeJeu=nMode then Exit;
  end;
@@ -953,7 +879,6 @@ begin
  if S='' then
   Raise EErrorFmt(5542, [CharModeJeu+nMode]);
  ChangeGameModeStr(S, Confirm);
- StoreTexExtensions; {--Convex--}
 end;
 
 function GameModeOk(nMode: Char) : Boolean;
@@ -984,7 +909,7 @@ begin
       Exit;
      end;
    end;
- Result:='';
+ Result:='';  
 end;
 
 {function GetIncludePath: String;

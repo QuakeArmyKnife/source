@@ -1,17 +1,18 @@
 {
+************
+
+ THIS IS AN EXTREME HACK! - we create a zip file containing only one file
+ then open the zip file and copy the compressed data... slooow....!... But
+ it works!
+
+************
+}
+
+{
 
 $Header$
  ----------- REVISION HISTORY ------------
 $Log$
-Revision 1.7  2000/10/16 22:29:29  aiv
-fixed a blatently stupid error
-
-Revision 1.6  2000/10/16 22:14:39  aiv
-zip files now handled entirely in pascal (no dlls!)
-
-Revision 1.5  2000/06/03 10:46:49  alexander
-added cvs headers
-
 
 }
 
@@ -26,103 +27,38 @@ procedure CompressStream(var Input: TMemoryStream; var Output: TMemoryStream);
 
 implementation
 
-uses zlib, zdeflate, zutil, setup;
+uses QkFileObjects, ZipMstr, QkZip2, Game, Setup;
 
-const
-  ZIP_OK = 0;
-
-Function GetZBufferSize: Integer;
-begin
-  Result:=Round(SetupSubSet(ssGeneral, 'Memory').
-    GetFloatSpec('CompressionBufferSize', 16));
-  if Result<16 then
-    Result:=16;
-  Result:=Result*1024 // Convert from KB to B.
-end;
-
-Function GetZLevel: Integer;
-begin
-  Result:=Round(SetupSubSet(ssGeneral, 'Memory').
-    GetFloatSpec('CompressionLevel', 8));
-  if (Result<0) or (Result>9) then
-    Result:=8;
-end;
+{$R ZipMsgUS.res}
 
 procedure CompressStream(var Input: TMemoryStream; var Output: TMemoryStream);
 var
-  buffer: pbytef;
-  buffered_data_size: longint;
-  c_stream: z_stream;
-  err, uTotalOutBefore, clevel, buffersize: longint;
+  TempZipName, TempZipName2, TempFileName: String;
+  ZM:TZipMaster;
+  T:TFileStream;
+  F:TLocalFileHeader;
+  sig:Longint;
 begin
-  clevel:=GetZLevel;
-  buffersize:=GetZBufferSize;
-
-  getmem(buffer, buffersize);
-  {Initialise C_STREAM}
-  c_stream.avail_in := input.size;
-  c_stream.next_in := pBytef(Input.memory);
-
-  c_stream.avail_out := uInt(buffersize);
-  c_stream.next_out := buffer;
-
-  c_stream.total_in := 0;
-  c_stream.total_out := 0;
-
-  c_stream.zalloc := nil;
-  c_stream.zfree := nil;
-  c_stream.opaque := nil;
-
-  buffered_data_size := 0;
-
-  err := deflateInit2(c_stream, clevel, Z_DEFLATED, -MAX_WBITS, DEF_MEM_LEVEL, 0);
-
-  if err <> ZIP_OK then
-    raise exception.create('Error! Zip.pas - CompressStream: DeflateInit<>ZIP_OK');
-  while ((err = ZIP_OK) and (c_stream.avail_in > 0)) do begin
-    if (c_stream.avail_out = 0) then begin
-      output.writebuffer(buffer^, buffered_data_size);
-      buffered_data_size := 0;
-      c_stream.avail_out := uInt(buffersize);
-      c_stream.next_out := buffer;
-    end;
-
-    uTotalOutBefore := c_stream.total_out;
-    err := deflate(c_stream, Z_NO_FLUSH);
-    Inc(buffered_data_size, c_stream.total_out - uTotalOutBefore);
-  end;
-  if err <> ZIP_OK then
-    raise exception.create('Error! Zip.pas - CompressStream: ' + c_stream.msg);
-
-  c_stream.avail_in := 0;
-  while (err = ZIP_OK) do begin
-    if (c_stream.avail_out = 0) then begin
-      output.writebuffer(buffer^, buffered_data_size);
-      buffered_data_size := 0;
-      c_stream.avail_out := uInt(buffersize);
-      c_stream.next_out := buffer;
-    end;
-    uTotalOutBefore := c_stream.total_out;
-    err := deflate(c_stream, Z_FINISH);
-    Inc(buffered_data_size, c_stream.total_out - uTotalOutBefore);
-  end;
-
-  if (err = Z_STREAM_END) then
-    err := ZIP_OK { this is normal }
-  else if err <> ZIP_OK then
-    raise exception.create('Error! Zip.pas - CompressStream: ' + c_stream.msg);
-
-  if (buffered_data_size > 0) and (err = ZIP_OK) then
-    output.writebuffer(buffer^, buffered_data_size);
-
-  if (err = ZIP_OK) then
-    err := deflateEnd(c_stream);
-  if err <> ZIP_OK then
-    raise exception.create('Error! Zip.pas - CompressStream: ' + c_stream.msg);
-
-  freemem(buffer, buffersize);
-
+  TempZipName2:=MakeTempFileName(TagToDelete);
+  TempFileName:=MakeTempFileName(TagToDelete);
+  TempZipName:=ChangeFileExt(TempZipName2,'.zip');
+  Input.SaveToFile(TempFileName);
+  ZM:=TZipMaster.Create(Nil);
+  ZM.DLLDirectory:=GetDLLDirectory;
+  ZM.ZipFilename:=TempZipName;
+  ZM.AddCompLevel:=8;
+  ZM.List;
+  ZM.FSpecArgs.Clear;
+  ZM.FSpecArgs.Add(TempFileName);
+  ZM.Add;
+  ZM.Free;
+  T:=TFileStream.Create(TempZipName,fmOpenRead);
+  T.Seek(0,soFromBeginning);
+  T.ReadBuffer(Sig,4);
+  T.ReadBuffer(F,Sizeof(F));
+  T.Seek(F.FileName_Len+F.ExtraField_Len, soFromCurrent);
+  Output.CopyFrom(T,F.Compressed);
+  T.Free;
 end;
 
 end.
-

@@ -26,12 +26,6 @@ See also http://www.planetquake.com/quark
 $Header$
  ----------- REVISION HISTORY ------------
 $Log$
-Revision 1.5  2000/08/25 17:57:24  decker_dk
-Layout indenting
-
-Revision 1.4  2000/07/21 20:01:33  decker_dk
-Correctly Save HalfLife WAD3s
-
 Revision 1.3  2000/07/09 13:20:43  decker_dk
 Englishification and a little layout
 
@@ -47,8 +41,7 @@ unit QkHL;
 interface
 
 uses Windows, SysUtils, Classes, Graphics, Dialogs, Controls,
-     QkObjects, QkFileObjects, QkTextures, QkWad
-     ,QkQ1;
+     QkObjects, QkFileObjects, QkTextures, QkWad;
 
 type
  QTextureHL = class(QTexture1)
@@ -134,11 +127,9 @@ begin
 end;
 
 procedure QTextureHL.SaveFile(Info: TInfoEnreg1);
-(*
 var
  S: String;
  PalSize: SmallInt;
-*)
 begin
  with Info do case Format of
   1: begin  { as stand-alone file }

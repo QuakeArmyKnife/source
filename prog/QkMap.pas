@@ -26,18 +26,6 @@ See also http://www.planetquake.com/quark
 $Header$
  ----------- REVISION HISTORY ------------
 $Log$
-Revision 1.18  2000/10/26 17:09:52  tiglari
-read soEnableBrushPrim
-
-Revision 1.17  2000/09/24 23:45:16  alexander
-committed tiglaris .map loading and bezier texture missing fix
-
-Revision 1.16  2000/09/14 18:00:22  decker_dk
-Moved QTexture1 and QTexture2 into QkQ1.PAS and QkQ2.PAS
-
-Revision 1.15  2000/08/20 11:16:47  aiv
-Removed (not req'd)
-
 Revision 1.14  2000/07/30 11:21:03  tiglari
 put in pascal version of map saving flag code from mapquakemenu.py
 to make save flags apply when map is saved from  File menu.  Question:
@@ -133,8 +121,7 @@ function ReadEntityList(Racine: TTreeMapBrush; const SourceFile: String; BSP: QB
 implementation
 
 uses Qk1, QkQme, QkMapPoly, qmath, Travail, Setup,
-  Qk3D, QkBspHulls, Undo, Game, Quarkx, PyForms, QkPixelSet {Rowdy}, Bezier {/Rowdy}
-  ,QkQ2;
+  Qk3D, QkBspHulls, Undo, Game, Quarkx, PyForms, QkPixelSet {Rowdy}, Bezier {/Rowdy};
 
 {$R *.DFM}
 
@@ -821,7 +808,7 @@ expected one.
  { /tiglari }
  end;
 
- function ReadSquareTex4 : Double;
+ function ReadSquareTex4() : Double;
  begin
   ReadSymbol(sSquareBracketLeft);
   {:=NumericValue;}
@@ -1230,10 +1217,8 @@ begin
        if MapOptionSpecs.Values['DisableEnhTex']<>'' then
          saveflags:=saveflags or soDisableEnhTex;
        if MapOptionSpecs.Values['DisableFPCoord']<>'' then
-         saveflags:=saveflags or soDisableFPCoord;
-       if MapOptionSpecs.Values['EnableBrushBrim']<>'' then
-         saveflags:=saveflags or soEnableBrushPrim;
-      saveflags:=saveflags or IntSpec['saveflags']; {merge in selonly}
+         saveflags:=saveflags or soDisableEnhTex;
+       saveflags:=saveflags or IntSpec['saveflags']; {merge in selonly}
 
      { TTreeMap(Racine).SauverTexte(List, Dest, IntSpec['saveflags'], HxStrings); }
        TTreeMap(Racine).SauverTexte(List, Dest, saveflags, HxStrings);

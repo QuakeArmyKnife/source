@@ -24,15 +24,6 @@ See also http://www.planetquake.com/quark
 $Header$
  ----------- REVISION HISTORY ------------
 $Log$
-Revision 1.13  2000/08/25 18:01:47  decker_dk
-Layout indenting
-
-Revision 1.12  2000/08/20 10:42:27  aiv
-Added $IFDEF's for Usage of ImgList.dcu (D4+)
-
-Revision 1.11  2000/07/21 20:01:33  decker_dk
-Correctly Save HalfLife WAD3s
-
 Revision 1.10  2000/07/18 19:38:01  decker_dk
 Englishification - Big One This Time...
 
@@ -49,22 +40,15 @@ Revision 1.6  2000/05/21 13:11:50  decker_dk
 Find new shaders and misc.
 
 }
+
 unit QkWad;
 
 interface
 
-{$IFNDEF VER90} // D2
-  {$DEFINE DontNeedImgListDCU}
-{$ENDIF}
-{$IFNDEF VER100} // D3
-  {$DEFINE DontNeedImgListDCU}
-{$ENDIF}
-
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   QkFileObjects, TB97, QkObjects, StdCtrls, ExtCtrls, ComCtrls, CommCtrl,
-  QkListView, QkTextures, Game, QkForm, QkPixelSet
-  {$IFNDEF DontNeedImgListDCU}, ImgList{$ENDIF};
+  QkListView, QkTextures, Game, QkForm, QkPixelSet, ImgList{, ImgList};
 
 type
  QWad = class(QLvFileObject)
@@ -116,8 +100,7 @@ type
 
 implementation
 
-uses QkUnknown, Travail, Qk1, Setup, Quarkx, QkHL
-  ,QkQ1;
+uses QkUnknown, Travail, Qk1, Setup, Quarkx, QkHL;
 
 {$R *.DFM}
 
@@ -178,9 +161,9 @@ begin
  else
   begin
    S:=Q.Name+Q.TypeInfo;
-   { allow any ".wad_?" or ".wad3_?" file }
-   Result:=ieResult[(CompareText(Copy(S, Length(S)-5, 5), '.wad_')  = 0)
-                 or (CompareText(Copy(S, Length(S)-6, 6), '.wad3_') = 0)];
+   Result:=ieResult[       { allow any ".wad_?" or ".wad3_?" file }
+       (CompareText(Copy(S, Length(S)-5, 5), '.wad_') = 0)
+    or (CompareText(Copy(S, Length(S)-6, 6), '.wad3_') = 0)];
   end;
 end;
 
@@ -206,27 +189,24 @@ var
  Q: QObject;
  Prefix: String;
 begin
-  case ReadFormat of
-  1: { as stand-alone file }
-    begin
+ case ReadFormat of
+  1: begin  { as stand-alone file }
       if FSize<SizeOf(Header) then
-        Raise EError(5519);
+       Raise EError(5519);
       Origine:=F.Position;
       F.ReadBuffer(Header, SizeOf(Header));
       if Header.Signature=SignatureWad2 then
-        Prefix:='.wad_'
+       Prefix:='.wad_'
       else
-      begin
-        if Header.Signature=SignatureWad3 then
-          Prefix:='.wad3_'
-        else
-          Raise EErrorFmt(5505, [LoadName, Header.Signature, SignatureWad2, SignatureWad3]);
-      end;
+       if Header.Signature=SignatureWad3 then
+        Prefix:='.wad3_'
+       else
+        Raise EErrorFmt(5505, [LoadName, Header.Signature, SignatureWad2]);
       I:=Header.NoOfFileEntries * SizeOf(TWadFileRec);
       if (I<0) or (Header.PosRep<SizeOf(TWadHeader)) then
-        Raise EErrorFmt(5509, [71]);
+       Raise EErrorFmt(5509, [71]);
       if Header.PosRep + I > FSize then
-        Raise EErrorFmt(5186, [LoadName]);
+       Raise EErrorFmt(5186, [LoadName]);
 
       GetMem(Entrees, I);
       try
@@ -234,24 +214,24 @@ begin
         F.ReadBuffer(Entrees^, I);
         P:=Entrees;
         for I:=1 to Header.NoOfFileEntries do
-        begin
-          if (P^.Position+P^.Taille > FSize) or
-             (P^.Position<SizeOf(Header)) or
-             (P^.Taille<0) then
-            Raise EErrorFmt(5509, [72]);
+         begin
+          if (P^.Position+P^.Taille > FSize)
+          or (P^.Position<SizeOf(Header))
+          or (P^.Taille<0) then
+           Raise EErrorFmt(5509, [72]);
           F.Position:=P^.Position;
           Q:=OpenFileObjectData(F, CharToPas(P^.Nom)+Prefix+P^.InfoType, P^.Taille, Self);
           SubElements.Add(Q);
           LoadedItem(rf_Default, F, Q, P^.Taille);
           Inc(P);
-        end;
+         end;
       finally
         FreeMem(Entrees);
       end;
-    end;
-  else
-    inherited;
-  end;
+     end;
+ else
+   inherited;
+ end;
 end;
 
 procedure QWad.SaveFile(Info: TInfoEnreg1);
@@ -358,7 +338,7 @@ begin
   1: Result:=QWad;
  else
   Result:=Nil;
- end;
+ end; 
 end;
 
 function QWad.ConversionFrom(Source: QFileObject) : Boolean;
@@ -426,63 +406,59 @@ begin
      {TT:=Specifics.Values['TextureType'];
       if TT='' then TT:='.wad_D';}
       I:=Count * SizeOf(LongInt);
-      GetMem(Positions, I);
-      try
-       F.ReadBuffer(Positions^, I);
-       P:=Positions;
-       for I:=1 to Count do
-        begin
-         if P^<0 then  { missing texture }
-          begin
-           Size:=0;
-           S:=LoadStr1(5522);
-          end
-         else
-          begin
-           if (P^>FSize) or (P^<Min) then
-            Raise EErrorFmt(5509, [92]);
-           F.Position:=Origine + P^;
-           if I=Count then
-            MaxSize:=FSize
-           else
-            MaxSize:=(PLongInt(PChar(P)+SizeOf(LongInt)))^;
-           Dec(MaxSize, P^);
-           if MaxSize<SizeOf(Header) then
-            begin
-             Size:=0;
-             S:=LoadStr1(5523);
-            end
-           else
-            begin
-             F.ReadBuffer(Header, SizeOf(Header));
-             S:=CharToPas(Header.Nom);
-             if MaxSize>SizeOf(Header) then
-              begin
-               Size:=CheckQ1Miptex(Header, MaxSize);
-               if Size>MaxSize then
-                Size:=0
-               else
-                Size:=MaxSize;
-              end
-             else
-              Size:=0;   { assumes an empty texture (for Half-Life .bsp's) }
-             F.Seek(-SizeOf(Header), soFromCurrent);
-            end;
-          end;
-         if Size=0 then
-          Q:=OpenFileObjectData(F, S, Size, Self)
-         else
-          Q:=OpenFileObjectData(F, S+'.wad_D', Size, Self);
-         SubElements.Add(Q);
-         LoadedItem(rf_Default, F, Q, Size);
-         Inc(P);
-        end;
-      finally
-       FreeMem(Positions);
-      end;
+      GetMem(Positions, I); try
+      F.ReadBuffer(Positions^, I);
+      P:=Positions;
+      for I:=1 to Count do
+       begin
+        if P^<0 then  { missing texture }
+         begin
+          Size:=0;
+          S:=LoadStr1(5522);
+         end
+        else
+         begin
+          if (P^>FSize) or (P^<Min) then
+           Raise EErrorFmt(5509, [92]);
+          F.Position:=Origine + P^;
+          if I=Count then
+           MaxSize:=FSize
+          else
+           MaxSize:=(PLongInt(PChar(P)+SizeOf(LongInt)))^;
+          Dec(MaxSize, P^);
+          if MaxSize<SizeOf(Header) then
+           begin
+            Size:=0;
+            S:=LoadStr1(5523);
+           end
+          else
+           begin
+            F.ReadBuffer(Header, SizeOf(Header));
+            S:=CharToPas(Header.Nom);
+            if MaxSize>SizeOf(Header) then
+             begin
+              Size:=CheckQ1Miptex(Header, MaxSize);
+              if Size>MaxSize then
+               Size:=0
+              else
+               Size:=MaxSize;
+             end
+            else
+             Size:=0;   { assumes an empty texture (for Half-Life .bsp's) }
+            F.Seek(-SizeOf(Header), soFromCurrent);
+           end;
+         end;
+        if Size=0 then
+         Q:=OpenFileObjectData(F, S, Size, Self)
+        else
+         Q:=OpenFileObjectData(F, S+'.wad_D', Size, Self);
+        SubElements.Add(Q);
+        LoadedItem(rf_Default, F, Q, Size);
+        Inc(P);
+       end;
+      finally FreeMem(Positions); end;
      end;
- else
-  inherited;
+ else inherited;
  end;
 end;
 
@@ -635,7 +611,7 @@ begin
        begin
         Q:=FileObject.SubElements[I];
         if Q is QTexture then
-         case QTexture(Q).NeededGame of
+         case QTexture(Q).NeededGame of       
           mjNotQuake2: Include(Modes, False);
           mjQuake2: Include(Modes, True);
          end;

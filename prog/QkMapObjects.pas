@@ -26,15 +26,6 @@ See also http://www.planetquake.com/quark
 $Header$
  ----------- REVISION HISTORY ------------
 $Log$
-Revision 1.12  2000/10/17 20:31:19  tiglari
-ancestry & brush-number writing
-
-Revision 1.11  2000/08/20 10:50:45  aiv
-Fixed 'Uses' clause for new model files
-
-Revision 1.10  2000/07/18 19:37:59  decker_dk
-Englishification - Big One This Time...
-
 Revision 1.9  2000/07/16 16:34:50  decker_dk
 Englishification
 
@@ -54,7 +45,7 @@ interface
 
 uses Windows, SysUtils, Classes, Graphics, QkObjects, qmath,
      QkExplorer, QkFileObjects, QkForm, qmatrices, CommCtrl,
-     Menus, Controls, Qk3D, QkModel, QkFrame, QkMdlObject, QkComponent, Python;
+     Menus, Controls, Qk3D, QkMdlObjects, Python;
 
 {$DEFINE RemoveEmptySpecs}
 
@@ -69,7 +60,6 @@ const
  soIgnoreToBuild  = 2;
  soDisableEnhTex  = 4;
  soDisableFPCoord = 8;
- soEnableBrushPrim = 16;
  soDirectDup         = $04000000;
  soBSP               = $08000000;
  soOutsideWorldspawn = $10000000;
@@ -236,15 +226,12 @@ procedure ReleaseMapIcons;
 function LongueurVectNormal : Single;}
 procedure CheckTreeMap(Racine: TTreeMap);
 
-const
-   Comment: array[Boolean] of String =
-    ('//',';');
  {------------------------}
 
 implementation
 
 uses Setup, QkMapPoly, Undo, FormCfg,
-     Game, QkMacro, Ed3DFX, Quarkx, PyMath,
+     QkMdl, Game, QkMacro, Ed3DFX, Quarkx, PyMath,
      PyMapView, PyObjects, QkImages, Bezier;
 
  {------------------------}
@@ -269,7 +256,6 @@ begin
     DeleteObject(Brush);
    end;
 end;*)
-
 
 procedure SetupWhiteOnBlack(WhiteOnBlack: Boolean);
 begin
@@ -1035,11 +1021,9 @@ procedure TTreeMapSpec.SauverSpec;
 const
  LineStarts: array[Boolean] of String = (' "', '"');
 var
- MJ, S, Msg, LineStart: String;
+ S, Msg, LineStart: String;
  P1, I, J, P: Integer;
 begin
- MJ:=CharModeJeu;
- Dest.Add(Comment[(MJ>='A') and (MJ<='Z')]+' '+Ancestry);
  Dest.Add('{');
  LineStart:=LineStarts[Flags and soBSP <> 0];
  Dest.Add(LineStart+SpecClassname+'" "'+Name+'"');
@@ -2078,29 +2062,19 @@ end;
 
 procedure TTreeMapGroup.SauverTexte;
 var
- I,J: Integer;
+ I: Integer;
  T: TTreeMap;
- MJ: Char;
 begin
  if (Flags and soIgnoreToBuild <> 0)
  and (ViewFlags and vfIgnoreToBuildMap <> 0) then
   Exit;
  if Odd(SelMult) then
   Flags:=Flags and not soSelOnly;
- J:=0;
- MJ:=CharModeJeu;
  for I:=0 to SubElements.Count-1 do
   begin
    T:=TTreeMap(SubElements[I]);
    if (Flags and soSelOnly = 0) or ControleSelection(T) then
-   begin
-    if (T is TTreeMapEntity) or (T is TTreeMapBrush) then
-     begin
-      Texte.Add(Comment[(MJ>='A') and (MJ<='Z')]+' Entity '+IntToStr(J));
-      J:=J+1;
-     end;
     T.SauverTexte(Negatif, Texte, Flags, HxStrings);
-   end;
   end;
 end;
 
@@ -2169,14 +2143,11 @@ begin
 end;
 
 procedure TTreeMapBrush.SauverTexte;
-
 var
  Polyedres: TQList;
  I: Integer;
  V1, V2: TVect;
  OriginBrush: PVect;
- MJ : Char;
- S : String;
 begin
  SauverSpec(Texte, HxStrings, Flags);
  if Flags and soBSP = 0 then
@@ -2206,13 +2177,8 @@ begin
          end;
         Break;
        end;
-   MJ:=CharModeJeu;
    for I:=0 to Polyedres.Count-1 do
-    begin
-     S:= Comment[(MJ>='A') and (MJ<='Z')]+' Brush '+IntToStr(I);
-     Texte.Add(S);
-     TPolyedre(Polyedres[I]).SauverTextePolyedre(Texte, OriginBrush, Flags);
-    end;
+    TPolyedre(Polyedres[I]).SauverTextePolyedre(Texte, OriginBrush, Flags);
    { proceed with Bezier patches }
    Polyedres.Clear;
    ListeEntites(Polyedres, [ecBezier]);
