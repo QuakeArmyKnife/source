@@ -23,9 +23,6 @@ http://www.planetquake.com/quark - Contact information in AUTHORS.TXT
 $Header$
 ----------- REVISION HISTORY ------------
 $Log$
-Revision 1.19  2002/03/07 19:17:48  decker_dk
-Removed QImages, as it was just another name for QImage
-
 Revision 1.18  2001/11/11 01:28:49  tiglari
 icon leak fixes
 
@@ -150,7 +147,7 @@ type
     procedure SetParentFrames(nFrame: QFrame);
     Function FindRoot: QObject;
     function GetOriginOfComponent(mode: Integer): TVect;
-    (*function FindRefFrame: QFrame;*)
+    function FindRefFrame: QFrame;
   end;
 
 implementation
@@ -1277,12 +1274,10 @@ begin
   end;
 end;
 
-(*
 function QComponent.FindRefFrame: QFrame;
 begin
    { FIXME:  just noticed a warning here }
 end;
-*)
 
 
 initialization

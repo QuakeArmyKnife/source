@@ -23,10 +23,6 @@ http://www.planetquake.com/quark - Contact information in AUTHORS.TXT
 $Header$
  ----------- REVISION HISTORY ------------
 $Log$
-Revision 1.3  2001/10/10 11:54:57  tiglari
-Move QObjectStringlist into interface section so that it can be freed in
- Qk1:TForm1.FormDestroy
-
 Revision 1.2  2001/03/20 21:45:22  decker_dk
 Updated copyright-header
 
@@ -41,11 +37,14 @@ interface
 uses Classes, QkObjects;
 
 procedure RegisterQObject(Q: QObjectClass; Prior: Char);
+function GetRegisteredQObject(const Ext: String) : QObjectClass;
 function ConstructQObject(const Name: String; nParent: QObject) : QObject;
-function RequestClassOfType(const nTypeInfo: String) : QObjectClass;
 function NeedClassOfType(const nTypeInfo: String) : QObjectClass;
 procedure ListFileExt(L: TStrings);
 procedure BuildFileExt(L: TStrings);
+
+var
+ QObjectClassList: TStringList = Nil;
 
  {------------------------}
 
@@ -56,8 +55,6 @@ uses
  {$IFDEF Debug} MemTester, {$ENDIF}
  QkFileObjects, Quarkx;
 
-var
- QObjectClassList: TStringList = Nil;
 
  {------------------------}
 
@@ -67,11 +64,6 @@ procedure RegisterQObject(Q: QObjectClass; Prior: Char);
  'Q' is the class which should be registered.
  'Prior' is a letter, which will be used to prefix 'Q's TypeInfo with, and
  then sorted by 'Prior+Q.TypeInfo()' - Why it needs to be sorted I dont know.
-  (Update by Decker 2002-06-20)
- It needs to be sorted, because ConstructQObject() loops backwards through the
- list, in search for a match, and if it does not find any, the lowest priority
- is automatically choosen. Only 'QkUnknown' has (must have) the lowest
- priority, which is #32.
 }
 begin
   if QObjectClassList=Nil then
@@ -83,16 +75,27 @@ begin
   QObjectClassList.AddObject(Prior+Q.TypeInfo, TObject(Q));
 end;
 
+function GetRegisteredQObject(const Ext: String) : QObjectClass;
+var
+  J: Integer;
+begin
+  for J:=0 to QObjectClassList.Count-1 do
+  begin
+    if CompareText(Copy(QObjectClassList[J], 2, MaxInt), Ext) = 0 then
+    begin
+      Result:=QObjectClass(QObjectClassList.Objects[J]);
+      Exit;
+    end;
+  end;
+  Result:=Nil;
+end;
+
 function ConstructQObject(const Name: String; nParent: QObject) : QObject;
-{ (Comment by Decker 2001-01-21)
+{ (Comment by Decker 2001-01-21
  This function, will create an object based on the 'TypeInfo/FilenameExtension'
  of the 'Name'. E.q. if 'Name' contains "MyTexture.WAL", it will create an object
  of the registered class which 'TypeInfo()' function return ".WAL".
-  (Update by Decker 2002-06-20)
- The new object will be told that it belongs to 'nParent', however that does not
- make the Parent think it has this new object as its child - someone must perform
- the 'Parent.SubElements.Add(<the new object>)' code after the call to
- ConstructQObject() to ensure that.
+ The new object will belong to, and be child of 'nParent'.
 }
 var
   I: Integer;
@@ -109,11 +112,7 @@ begin
   Result := QObjectClass(QObjectClassList.Objects[I]).Create(Copy(Name, 1, Length(Name)-Length(S)+1), nParent);
 end;
 
-function RequestClassOfType(const nTypeInfo: String) : QObjectClass;
-{ (Comment by Decker 2002-06-20
- A function which will search for a class-type, that matches the requested
- 'TypeInfo'. Returns the found class-type, or NIL if no match could be found.
-}
+function NeedClassOfType(const nTypeInfo: String) : QObjectClass;
 var
   I: Integer;
   S: String;
@@ -127,21 +126,7 @@ begin
       Exit;
     end;
   end;
-  Result:=Nil;
-end;
-
-function NeedClassOfType(const nTypeInfo: String) : QObjectClass;
-{ (Comment by Decker 2002-06-20)
- A function which will search for a class-type, that matches the requested
- 'TypeInfo'. Returns the found class-type, or raises an exception if no match
- could be found.
-}
-begin
-  Result:=RequestClassOfType(nTypeInfo);
-  if Result=Nil then
-  begin
-    Raise EErrorFmt(5644, [nTypeInfo]);
-  end;
+  Raise EErrorFmt(5644, [nTypeInfo]);
 end;
 
 procedure ListFileExt(L: TStrings);
@@ -170,11 +155,6 @@ begin
 end;
 
 procedure BuildFileExt(L: TStrings);
-{ (Comment by Decker 2002-06-20)
- Builds a string-list, containing all the supported file-types, and inserts
- a "Known types" at the top of the list, with all file-types(extensions) as
- the mask.
-}
 var
   I: Integer;
   C: QObjectClass;
@@ -195,24 +175,20 @@ begin
       if Info.FileExt<>0 then
       begin
         L.Add(LoadStr1(Info.FileExt));
-        if Info.DefaultExt <> '' then
+        if Info.DefaultExt<>'' then
         begin
-          if AllTypes1 <> '' then
+          if AllTypes1<>'' then
           begin
-            AllTypes1 := AllTypes1 + ' ';
-            AllTypes2 := AllTypes2 + ';';
+            AllTypes1:=AllTypes1+' ';
+            AllTypes2:=AllTypes2+';';
           end;
-          AllTypes1 := AllTypes1 +        Info.DefaultExt;
-          AllTypes2 := AllTypes2 + '*.' + Info.DefaultExt;
+          AllTypes1:=AllTypes1+Info.DefaultExt;
+          AllTypes2:=AllTypes2+'*.'+Info.DefaultExt;
         end;
       end;
     end;
   end;
   L.Insert(0, FmtLoadStr1(768, [AllTypes1, AllTypes2]));
 end;
-
-initialization
-finalization
- QObjectClassList.Free;
 
 end.

@@ -23,13 +23,8 @@ http://www.planetquake.com/quark - Contact information in AUTHORS.TXT
 $Header$
  ----------- REVISION HISTORY ------------
 $Log$
-Revision 1.49  2002/12/21 09:25:13  tiglari
+Revision 1.47.2.1  2002/12/21 09:24:00  tiglari
 steamline v220 map-reading
-
-Revision 1.48  2002/12/15 14:05:14  tiglari
-improve efficiency of wc33 reading by eliminating unnecessary projections of
- texture points to planes (this should be tested more to check that it's
- really right)
 
 Revision 1.47  2002/05/15 22:04:51  tiglari
 fixes to map reading error recording (so that new maps can be created ..)
@@ -1140,18 +1135,14 @@ expected one.
   (Max McGuire's Quake2 BSP file format tutorial on
    www.flipcode.com)
 
-  However wc3.3 does *not* seem to require the texture-vectors
-  to lie in an axis plane, and if you write with that assumption
-  (projecting the points), things get distorted.
-
   U/V Axis/Shift are straight from the 4-vectors, param[3]
   is rot which is ignored (implicit from the axes), while
-  param[4,5] are UV scales.  Diferent from the bsp-format
-  is that the axes are normalized to length 1, and you
-  divide by the scale to get the .bsp-version of the axis.
-  (Zoner's HL tools source, textures.cpp) *)
+  param[4,5] are UV scales.  The axis-vectors are of
+  length one, and you divide by the scale to get the corresponding
+  .bsp-type axis vector. (Zoner's HL tools source,
+  textures.cpp) *)
 
-procedure WC33Params;
+ procedure WC33Params;
  var
   PP0, PP1, PP2, NP0, NP1, NP2, PlanePoint, TexNorm : TVect;
  begin
@@ -1366,18 +1357,11 @@ begin
                  end;
               end
               else
-              begin
                 for I:=1 to 5 do
                  begin
                   Params[I]:=NumericValue;
                   ReadSymbol(sNumValueToken);
                  end;
-              if charmodejeu=mjGenesis3D then
-              begin
-                if PointsToPlane(Surface.Normale)='X' then
-                   Params[4]:=-Params[4];
-              end;
-              end;
               {/DECKER}
               if SymbolType=sNumValueToken then
                begin

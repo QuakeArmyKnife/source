@@ -23,19 +23,13 @@ http://www.planetquake.com/quark - Contact information in AUTHORS.TXT
 $Header$
  ----------- REVISION HISTORY ------------
 $Log$
-Revision 1.67  2003/01/06 20:34:03  tiglari
+Revision 1.56.2.12  2003/01/06 20:37:07  tiglari
 Always write the three fields, for appropriate games, even if they're all 0
  (GtkRadiant wants it that way, as well as the mohaa tools)
 
-Revision 1.66  2003/01/05 03:36:17  tiglari
-Genesis3D support, with peculiar sign-flips and coordinate rounding
-
-Revision 1.65  2003/01/05 02:07:55  tiglari
-make threepoints in CylindreDeFace method more symmetrical, to prevent
+Revision 1.56.2.11  2003/01/05 02:05:10  tiglari
+make threepoints in CylendreDeFace method more symmetrical, to prevent
  problems with texture scales (detected by quantum_red)
-
-Revision 1.64  2003/01/03 07:49:01  tiglari
-transfer texture position management and swapsides stuff from rel-63a branch
 
 Revision 1.56.2.10  2003/01/01 05:09:59  tiglari
 fix Retourner_leavetex
@@ -777,7 +771,6 @@ begin
   end;
 end;
 
-
 function FaceRencontrePolyedre(F: PSurface; P: TPolyedre) : Boolean;
 var
  NbPoints, I, Face1: Integer;
@@ -1324,7 +1317,7 @@ var
  PX, PY: array[1..3] of TDouble;
  A, P2, S, C: TDouble;
  I: Integer;
- Plan : Char;
+ Plan: Char;
 begin
  Plan:=PointsToPlane(Normale);
  for I:=1 to 3 do
@@ -1374,16 +1367,6 @@ begin
  Params[1]:=-PX[1]*A;
  if Abs(Params[5])<rien2 then A:=1 else A:=1/Params[5];
  Params[2]:=PY[1]*A;
-
- if CharModeJeu=mjGenesis3D then
- begin
-   for I:= 0 to 5 do
-     Params[I]:=Round(Params[I]);
-   if Plan='Y' then
-       Params[3]:=-Params[3];
-   if Plan='X' then
-     Params[4]:=-Params[4];
- end;
 end;
 
 procedure RechercheAdjacents(Concerne, Source: PyObject; Simple, Double: Boolean);
@@ -2444,8 +2427,11 @@ var
  J: Integer;
  Q: QObject;
  { BrushPrim, Valve220Map : Boolean }
- WriteIntegers, UseIntegralVertices, ExpandThreePoints, AlwaysWriteThreeFields : Boolean;
+ WriteIntegers, UseIntegralVertices, ExpandThreePoints : Boolean;
+ // FIXME: if these were set at the map writing routine it might be
+ //    a (slight) optimization
  MapFormat: MapFormatTypes;
+ AlwaysWriteThreeFields: boolean;
 
     procedure write3vect(const P: array of Double; var S: String);
 {
@@ -2879,7 +2865,6 @@ var
            or AlwaysWriteThreefields  then {Decker - write face-flags when MOHAA;
              tiglari - and now all Q3 engine games, since GtkRadiant wants them
              we need the condition because this code gets run for all games }
-        if true then
         begin
           if S1='' then S1:='0';
           if S2='' then S2:='0';

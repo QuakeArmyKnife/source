@@ -67,8 +67,8 @@ procedure OpenFullScrDlg(nView: TPyMapView);
 
 implementation
 
-uses SystemDetails;
-
+uses
+  SystemDetails;
 {$R *.DFM}
 
  {------------------------}

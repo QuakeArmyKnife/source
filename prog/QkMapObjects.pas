@@ -979,8 +979,8 @@ procedure TTreeMapSpec.Deplacement(const PasGrille: TDouble);
 var
  mx: PyObject;
 begin
- inherited;
- if g_DrawInfo.ModeDeplacement=mdLinear then
+  inherited;
+  if g_DrawInfo.ModeDeplacement=mdLinear then
   begin
    mx:=MakePyMatrix(g_DrawInfo.Matrice);
    try

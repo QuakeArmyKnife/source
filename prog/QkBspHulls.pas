@@ -23,7 +23,7 @@ http://www.planetquake.com/quark - Contact information in AUTHORS.TXT
 $Header$
  ----------- REVISION HISTORY ------------
 $Log$
-Revision 1.24  2002/12/21 06:21:46  tiglari
+Revision 1.23.2.1  2002/12/21 06:20:49  tiglari
 invert threepoints for mirror-image textures
 
 Revision 1.23  2002/03/30 00:53:17  tiglari
@@ -703,7 +703,6 @@ begin
         {  Dist:=PlaneDist;  }
         end;
     end;
-    { Some changes needed here if NuTex2 branch stuff used  }
     Norm2:=Cross(VecDiff(P2,P1), VecDiff(P3,P1));
     if VecLength(Norm2)> rien then
     begin
