@@ -482,11 +482,19 @@ end;
 function xNewForm(self, args: PyObject) : PyObject; cdecl;
 var
  Temp: TPyForm;
+ s: PChar;
 begin
  try
+  Result:=Nil;
+  s:=Nil;
+  if not PyArg_ParseTupleX(args, '|s', [@s]) then
+   Exit;
   Temp:=TPyForm.Create(Application);
  {Temp.Show;}
-     Form1.Enabled:=False;
+  if s=Nil then
+   Form1.Enabled:=False   { special trick for the installer of QuArK }
+  else
+   Temp.Caption:=s;
      //DefWindowProc(Form1.Handle, WM_SYSCOMMAND, SC_MINIMIZE, 0);
   Result:=Temp.WindowObject;
   Py_INCREF(Result);
@@ -2625,17 +2633,8 @@ begin
   if S[I]='\' then
    System.Insert('\', S, I);
  S:=Format(PythonSetupString, [S]);
- { tiglari:
-   S will now be the python commands:
-    import sys
-    sys.path[:0]=["<the path to the quark exe>"]
-    import quarkpy
- }
  if PyRun_SimpleString(PChar(S))<>0 then FatalError(-8);
  InitSetup;
- { tiglari:
-   runs quarkpy.RunQuArK(), defined in quarkpy.__init__.py;
-   mostly sets up icons and stuff like that.}
  if PyRun_SimpleString(PythonRunPackage)<>0 then FatalError(-7);
  PythonCodeEnd;
  PythonUpdateAll;
