@@ -25,7 +25,6 @@ $Header$
  ----------- REVISION HISTORY ------------
 $Log$
 
-
 }
 
 unit GL1;

@@ -24,15 +24,8 @@ See also http://www.planetquake.com/quark
 $Header$
  ----------- REVISION HISTORY ------------
 $Log$
-Revision 1.23  2000/09/09 14:30:32  alexander
-fixed GetSousElements bug when acessing a subobject of an object whose file is not yet loaded
-
-Revision 1.22  2000/09/01 00:50:22  alexander
+Revision 1.20.2.1  2000/09/01 01:46:03  alexander
 set name
-
-Revision 1.21  2000/08/20 10:48:11  aiv
-iiMD3Bone -> iiModelBone
-iiMD3Tag -> iiModelTag
 
 Revision 1.20  2000/07/28 15:11:34  alexander
 set snapshot name
@@ -73,7 +66,7 @@ uses Windows, SysUtils, Messages, Classes, Clipbrd,
 {$DEFINE ShareSpecMem}
 
 const
- QuArKVersion            = 'quarksnapshot_20000910';
+ QuArKVersion            = 'REL6_1-pre-2';
 
  iiUnknownFile           = 0;
  iiExplorerGroup         = 1;
@@ -121,8 +114,8 @@ const
  iiPython                = 43;
  iiBezier                = 44;
  iiSpriteFile            = 45;
- iiModelTag              = 46;
- iiModelBone             = 47;
+ iiMD3Tag                = 46;
+ iiMD3Bone               = 47;
 
  InternalImagesCount     = 48;
 
@@ -1343,9 +1336,9 @@ begin
   end;
   {/alex ######### FIXME ! i think this is needed , and thus it should be
    enabled always !!!!!}
-  if (FFlags and ofSurDisque <> 0) and not FLoading then
-    Raise InternalE('GetSpecifics');
-  Result:=FSpecifics;
+ if (FFlags and ofSurDisque <> 0) and not FLoading then
+  Raise InternalE('GetSpecifics');
+ Result:=FSpecifics;
 end;
 
 function QObject.GetSubElements : TQList;
@@ -1357,9 +1350,9 @@ begin
   end;
   {/alex ######### FIXME ! i think this is needed , and thus it should be
    enabled always !!!!!}
-  if (FFlags and ofSurDisque <> 0) and not FLoading then
+ if (FFlags and ofSurDisque <> 0) and not FLoading then
     Raise InternalE('GetSubElements');
-  Result:=FSubElements;
+ Result:=FSubElements;
 end;
 {$ENDIF}
 

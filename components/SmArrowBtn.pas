@@ -3,8 +3,8 @@ $Header$
  ----------- REVISION HISTORY ------------
 $Log$
 
-
-}unit SmArrowBtn;
+}
+unit SmArrowBtn;
 
 interface
 

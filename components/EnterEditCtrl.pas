@@ -3,7 +3,6 @@ $Header$
  ----------- REVISION HISTORY ------------
 $Log$
 
-
 }
 unit EnterEditCtrl;
 

@@ -26,6 +26,10 @@ See also http://www.planetquake.com/quark
 $Header$
  ----------- REVISION HISTORY ------------
 $Log$
+Revision 1.10  2000/09/03 11:20:31  aiv
+archive conversion
+minor bug fixes to zip stuff
+
 Revision 1.9  2000/07/18 19:38:00  decker_dk
 Englishification - Big One This Time...
 
@@ -766,7 +770,7 @@ begin
          Count:=QPakFolder(FileObject).ExtractTo(Path);
          finally ProgressIndicatorStop; end;
          MessageDlg(FmtLoadStr1(5663, [Count, Path]), mtInformation, [mbOk], 0);
-        end;
+        end;  
       end;
   end;
 end;

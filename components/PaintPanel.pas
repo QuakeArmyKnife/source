@@ -3,8 +3,8 @@ $Header$
  ----------- REVISION HISTORY ------------
 $Log$
 
-
-}unit PaintPanel;
+}
+unit PaintPanel;
 
 interface
 
