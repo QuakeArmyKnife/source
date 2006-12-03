@@ -23,9 +23,6 @@ http://www.planetquake.com/quark - Contact information in AUTHORS.TXT
 $Header$
  ----------- REVISION HISTORY ------------
 $Log$
-Revision 1.21.2.10  2006/11/28 16:18:55  danielpharos
-Pushed MapView into the renderers and made OpenGL do (bad) Solid Colors
-
 Revision 1.21.2.9  2006/11/23 20:11:27  danielpharos
 Removed now obsolete Ed3DEditors file
 Removed related Close3DEditors call

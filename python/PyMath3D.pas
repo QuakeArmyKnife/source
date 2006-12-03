@@ -23,9 +23,6 @@ http://www.planetquake.com/quark - Contact information in AUTHORS.TXT
 $Header$
  ----------- REVISION HISTORY ------------
 $Log$
-Revision 1.6.2.5  2006/11/23 20:11:50  danielpharos
-Fix for camera angles not working the right way
-
 Revision 1.6.2.4  2006/11/01 22:22:27  danielpharos
 BackUp 1 November 2006
 Mainly reduce OpenGL memory leak

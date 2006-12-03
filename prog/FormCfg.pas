@@ -23,6 +23,16 @@ http://www.planetquake.com/quark - Contact information in AUTHORS.TXT
 $Header$
  ----------- REVISION HISTORY ------------
 $Log$
+Revision 1.30.2.3  2006/11/04 02:08:16  cdunde
+To stop filling multiple dropdown list with erroneous data,
+like for misc_model entity and
+To add Copy, Paste and Cut functions to Specifices\Arg
+page RMB pop-up menu.
+
+Revision 1.30.2.2  2006/11/01 22:22:29  danielpharos
+BackUp 1 November 2006
+Mainly reduce OpenGL memory leak
+
 Revision 1.32  2006/09/28 06:55:59  cdunde
 To stop filling multiple dropdown list with erroneous data, like for misc_model entity
 

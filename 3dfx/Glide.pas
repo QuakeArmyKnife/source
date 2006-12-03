@@ -23,9 +23,6 @@ http://www.planetquake.com/quark - Contact information in AUTHORS.TXT
 $Header$
  ----------- REVISION HISTORY ------------
 $Log$
-Revision 1.12.2.1  2006/11/23 20:14:59  danielpharos
-Added counter to make sure the renderers only unload when they're not used anymore
-
 Revision 1.12  2005/09/28 10:48:31  peter-b
 Revert removal of Log and Header keywords
 

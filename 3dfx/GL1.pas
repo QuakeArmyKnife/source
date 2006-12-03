@@ -23,10 +23,6 @@ http://www.planetquake.com/quark - Contact information in AUTHORS.TXT
 $Header$
  ----------- REVISION HISTORY ------------
 $Log$
-Revision 1.13  2006/11/30 00:42:32  cdunde
-To merge all source files that had changes from DanielPharos branch
-to HEAD for QuArK 6.5.0 Beta 1.
-
 Revision 1.12.2.9  2006/11/23 20:14:59  danielpharos
 Added counter to make sure the renderers only unload when they're not used anymore
 

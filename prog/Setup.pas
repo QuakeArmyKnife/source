@@ -23,10 +23,6 @@ http://www.planetquake.com/quark - Contact information in AUTHORS.TXT
 $Header$
  ----------- REVISION HISTORY ------------
 $Log$
-Revision 1.47.2.2  2006/11/01 22:22:29  danielpharos
-BackUp 1 November 2006
-Mainly reduce OpenGL memory leak
-
 Revision 1.47  2006/08/02 07:17:57  cdunde
 To add .md3 model editor 3D view support for Quake 4.
 

@@ -23,10 +23,6 @@ http://www.planetquake.com/quark - Contact information in AUTHORS.TXT
 $Header$
  ----------- REVISION HISTORY ------------
 $Log$
-Revision 1.5.2.8  2006/11/01 22:22:28  danielpharos
-BackUp 1 November 2006
-Mainly reduce OpenGL memory leak
-
 Revision 1.5  2005/09/28 10:48:31  peter-b
 Revert removal of Log and Header keywords
 

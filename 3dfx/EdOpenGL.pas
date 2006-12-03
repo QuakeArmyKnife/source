@@ -23,12 +23,8 @@ http://www.planetquake.com/quark - Contact information in AUTHORS.TXT
 $Header$
  ----------- REVISION HISTORY ------------
 $Log$
-Revision 1.35  2006/12/03 20:36:09  danielpharos
+Revision 1.33.2.16  2006/12/03 20:28:21  danielpharos
 Put the perspective in the correct place for OpenGL. Should fix any fog issues.
-
-Revision 1.34  2006/11/30 00:42:33  cdunde
-To merge all source files that had changes from DanielPharos branch
-to HEAD for QuArK 6.5.0 Beta 1.
 
 Revision 1.33.2.15  2006/11/28 16:18:55  danielpharos
 Pushed MapView into the renderers and made OpenGL do (bad) Solid Colors

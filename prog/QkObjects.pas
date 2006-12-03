@@ -23,9 +23,6 @@ http://www.planetquake.com/quark - Contact information in AUTHORS.TXT
 $Header$
  ----------- REVISION HISTORY ------------
 $Log$
-Revision 1.79.2.1  2006/11/29 05:00:28  cdunde
-For version change to 6.5 Beta.
-
 Revision 1.79  2006/05/05 06:04:44  cdunde
 To reverse Texture Memory changes. Cases problems with Quake 3 QkQ3.pas
 handling of textures in the Texture Browser, hour glass icon jitters and memeor usage

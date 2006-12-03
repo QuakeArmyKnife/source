@@ -23,9 +23,6 @@ http://www.planetquake.com/quark - Contact information in AUTHORS.TXT
 $Header$
  ----------- REVISION HISTORY ------------
 $Log$
-Revision 1.16.2.9  2006/11/23 20:12:22  danielpharos
-Removed now obsolete Ed3DEditors file
-
 Revision 1.16.2.8  2006/11/01 22:22:29  danielpharos
 BackUp 1 November 2006
 Mainly reduce OpenGL memory leak
